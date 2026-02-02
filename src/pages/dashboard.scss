@@ -1,0 +1,22 @@
+.top-left {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+}
+
+.top-right {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+}
+
+.bottom-area-ctr {
+  height: 240px;
+}
+
+.bottom {
+  bottom: 15px;
+  position: absolute;
+}

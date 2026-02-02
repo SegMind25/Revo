@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --panel-back: #141629;
+  --panel-stroke: #222544;
+  --main-back: #070a1b;
+  --main-text-color: #fff;
+  --secondary-text-color: #a0a5d0;
+  --input-color: #22233e;
+  --accent-color: #166ef1;
+  --button-hover: #262746;
+  --timeline-height: 240px;
+  --timeline-controls-height: 60px;
+  --timeline-height-full: 300px;
+}
+
+html {
+  overflow: hidden !important;
+}
+
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #5e627e33;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #a0a5d033;
+  border: 4.5px solid transparent;
+  border-radius: 10px;
+  background-clip: padding-box;
+  opacity: 0.3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a0a5d066;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.list-enter-active,
+.list-leave-active {
+  animation: bounce 0.5s;
+}
+
+.list-enter-from,
+.list-leave-to {
+  animation: bounce 0.5s reverse;
+}
+
+input[type="color"] {
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 10px;
+  border: none;
+  width: 36px;
+  height: 32px;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.scale-x-n1 {
+  transform: scaleX(-1);
+}
+
+.time-tick {
+  width: 1px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.212);
+  margin: 0 auto;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
