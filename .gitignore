@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+dist-ssr
+
+# Rust build artifacts
+src-tauri/target
+
+# Tauri
+src-tauri/WixTools
+
+# Editor and OS files
+*.local
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
