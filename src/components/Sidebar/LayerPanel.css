@@ -1,0 +1,84 @@
+.layer-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.layer-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-2);
+}
+
+.layer-track {
+    margin-bottom: var(--space-3);
+}
+
+.layer-track-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+}
+
+.layer-track-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.layer-track-actions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.layer-track-actions .btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: var(--space-1);
+}
+
+.layer-clips {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-left: var(--space-3);
+}
+
+.layer-clip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-elevated);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.layer-clip:hover {
+    background-color: var(--color-bg-tertiary);
+}
+
+.layer-clip-name {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.layer-clip .btn-icon {
+    width: 24px;
+    height: 24px;
+    padding: var(--space-1);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.layer-clip:hover .btn-icon {
+    opacity: 1;
+}

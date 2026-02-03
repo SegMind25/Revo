@@ -1,0 +1,31 @@
+.playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    pointer-events: none;
+}
+
+.playhead-handle {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-playhead);
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: ew-resize;
+    pointer-events: all;
+    box-shadow: var(--shadow-md);
+}
+
+.playhead-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background-color: var(--color-playhead);
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+}
