@@ -1,96 +1,75 @@
-import { type FC } from 'react';
-import { useVideoStore } from '../store/videoStore';
+import React from 'react';
+import { Layers, Eye, EyeOff, Lock, Unlock } from 'lucide-react';
 
-export const LayerPanel: FC = () => {
-    const { layers, selectedLayerId, selectLayer, updateLayer, removeLayer } = useVideoStore();
+interface Layer {
+    id: number;
+    name: string;
+    visible: boolean;
+    locked: boolean;
+    opacity: number;
+    blendMode: string;
+}
 
-    const handleToggleVisibility = (layerId: string, visible: boolean) => {
-        updateLayer(layerId, { visible: !visible });
+export function LayerPanel() {
+    const [layers, setLayers] = React.useState<Layer[]>([
+        { id: 1, name: 'Video 1', visible: true, locked: false, opacity: 100, blendMode: 'normal' },
+        { id: 2, name: 'Video 2', visible: true, locked: false, opacity: 100, blendMode: 'normal' },
+    ]);
+
+    const toggleVisibility = (id: number) => {
+        setLayers(layers.map(layer =>
+            layer.id === id ? { ...layer, visible: !layer.visible } : layer
+        ));
     };
 
-    const handleToggleLock = (layerId: string, locked: boolean) => {
-        updateLayer(layerId, { locked: !locked });
-    };
-
-    const handleDelete = (layerId: string) => {
-        if (confirm('Are you sure you want to delete this layer?')) {
-            removeLayer(layerId);
-        }
+    const toggleLock = (id: number) => {
+        setLayers(layers.map(layer =>
+            layer.id === id ? { ...layer, locked: !layer.locked } : layer
+        ));
     };
 
     return (
-        <div className="layer-panel">
-            <div className="layer-panel-header">
-                <h3>Layers</h3>
+        <div className="panel" style={{ width: 280, display: 'flex', flexDirection: 'column' }}>
+            <div className="panel-header flex items-center gap-2">
+                <Layers size={14} />
+                Layers
             </div>
-
-            <div className="layer-list">
-                {layers.length === 0 ? (
-                    <div className="layer-empty">
-                        <p>No layers yet</p>
-                        <span>Import a video or add text to get started</span>
-                    </div>
-                ) : (
-                    layers
-                        .slice()
-                        .sort((a, b) => b.zIndex - a.zIndex)
-                        .map((layer) => (
-                            <div
-                                key={layer.id}
-                                className={`layer-item ${selectedLayerId === layer.id ? 'selected' : ''}`}
-                                onClick={() => selectLayer(layer.id)}
+            <div className="panel-body" style={{ flex: 1, overflow: 'auto' }}>
+                <div className="flex flex-col gap-1">
+                    {layers.map((layer) => (
+                        <div
+                            key={layer.id}
+                            className="layer-item flex items-center gap-2 p-2 rounded-md"
+                            style={{
+                                background: 'var(--color-bg-tertiary)',
+                                border: '1px solid var(--color-border)',
+                                opacity: layer.visible ? 1 : 0.5,
+                            }}
+                        >
+                            <button
+                                className="btn-icon btn-ghost"
+                                style={{ padding: '4px' }}
+                                onClick={() => toggleVisibility(layer.id)}
                             >
-                                <div className="layer-icon">
-                                    {layer.type === 'video' && '🎬'}
-                                    {layer.type === 'text' && '📝'}
-                                    {layer.type === 'image' && '🖼️'}
-                                </div>
-
-                                <div className="layer-info">
-                                    <div className="layer-name">{layer.name}</div>
-                                    <div className="layer-time">
-                                        {layer.startTime.toFixed(1)}s - {(layer.startTime + layer.duration).toFixed(1)}s
-                                    </div>
-                                </div>
-
-                                <div className="layer-controls">
-                                    <button
-                                        className={`layer-btn ${!layer.visible ? 'inactive' : ''}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleToggleVisibility(layer.id, layer.visible);
-                                        }}
-                                        title={layer.visible ? 'Hide layer' : 'Show layer'}
-                                    >
-                                        {layer.visible ? '👁️' : '👁️‍🗨️'}
-                                    </button>
-
-                                    <button
-                                        className={`layer-btn ${layer.locked ? 'active' : ''}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleToggleLock(layer.id, layer.locked);
-                                        }}
-                                        title={layer.locked ? 'Unlock layer' : 'Lock layer'}
-                                    >
-                                        {layer.locked ? '🔒' : '🔓'}
-                                    </button>
-
-                                    <button
-                                        className="layer-btn delete"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDelete(layer.id);
-                                        }}
-                                        title="Delete layer"
-                                    >
-                                        🗑️
-                                    </button>
-                                </div>
+                                {layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                            </button>
+                            <button
+                                className="btn-icon btn-ghost"
+                                style={{ padding: '4px' }}
+                                onClick={() => toggleLock(layer.id)}
+                            >
+                                {layer.locked ? <Lock size={16} /> : <Unlock size={16} />}
+                            </button>
+                            <div style={{ flex: 1, fontSize: '0.875rem' }}>
+                                {layer.name}
                             </div>
-                        ))
-                )}
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
+                                {layer.opacity}%
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
-};
+}

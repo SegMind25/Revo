@@ -1,22 +1,24 @@
 # Dependencies
-node_modules
+node_modules/
+dist/
+target/
 
 # Build outputs
-dist
-dist-ssr
+src-tauri/target/
+*.log
 
-# Rust build artifacts
-src-tauri/target
-
-# Tauri
-src-tauri/WixTools
-
-# Editor and OS files
-*.local
+# OS
 .DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
-*~
 
-# Logs
-*.log
+# C++ Build
+native/build/
+*.o
+*.a
+*.so

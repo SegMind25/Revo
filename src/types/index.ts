@@ -1,62 +1,49 @@
-// Video layer types
-export interface VideoLayer {
-    id: string;
-    type: 'video' | 'text' | 'image';
-    name: string;
-    startTime: number;
-    duration: number;
-    zIndex: number;
-    visible: boolean;
-    locked: boolean;
-}
-
-export interface VideoLayerData extends VideoLayer {
-    type: 'video';
-    filePath: string;
-    videoElement?: HTMLVideoElement;
-}
-
-export interface TextLayerData extends VideoLayer {
-    type: 'text';
-    content: string;
-    fontSize: number;
-    fontFamily: string;
-    color: string;
-    x: number;
-    y: number;
-}
-
-export interface ImageLayerData extends VideoLayer {
-    type: 'image';
-    filePath: string;
-    x: number;
-    y: number;
+export interface VideoInfo {
     width: number;
     height: number;
-}
-
-export type AnyLayer = VideoLayerData | TextLayerData | ImageLayerData;
-
-// Project state
-export interface ProjectState {
-    layers: AnyLayer[];
-    currentTime: number;
+    framerate: number;
     duration: number;
+    codec_name: string;
+}
+
+export interface Clip {
+    id: number;
+    video_path: string;
+    track_id: number;
+    start_time: number;
+    duration: number;
+    source_start: number;
+}
+
+export interface Effect {
+    effect_type: string;
+    params: Record<string, number>;
+}
+
+export interface ExportSettings {
+    output_path: string;
+    format: string;
+    codec: string;
+    width: number;
+    height: number;
+    bitrate: number;
+    framerate: number;
+}
+
+export interface TimelineState {
+    clips: Clip[];
+    currentTime: number;
     playing: boolean;
-    zoom: number;
-    selectedLayerId: string | null;
+    zoomLevel: number;
+    duration: number;
 }
 
-// Export configuration
-export interface ExportConfig {
-    format: 'mp4' | 'webm';
-    quality: 'low' | 'medium' | 'high';
-    resolution: '720p' | '1080p' | '4k';
-    fps: 24 | 30 | 60;
-}
-
-export interface ExportProgress {
-    status: 'idle' | 'processing' | 'complete' | 'error';
-    progress: number;
-    message: string;
+export interface EditorStore extends TimelineState {
+    // Actions
+    setCurrentTime: (time: number) => void;
+    togglePlayback: () => void;
+    setZoomLevel: (level: number) => void;
+    addClip: (clip: Clip) => void;
+    removeClip: (clipId: number) => void;
+    updateDuration: () => void;
 }
