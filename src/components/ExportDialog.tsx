@@ -7,7 +7,7 @@ interface ExportDialogProps {
 
 export function ExportDialog({ onClose }: ExportDialogProps) {
     const [format, setFormat] = useState('mp4');
-    const [codec, setCodec] = useState('h264');
+    // const [codec, setCodec] = useState('h264');
     const [preset, setPreset] = useState('youtube');
     const [exporting, setExporting] = useState(false);
     const [progress, setProgress] = useState(0);

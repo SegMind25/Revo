@@ -11,7 +11,7 @@ import '@/styles/theme.css';
 
 function App() {
     const [showExportDialog, setShowExportDialog] = useState(false);
-    const { togglePlayback, setCurrentTime } = useEditorStore();
+    const { togglePlayback } = useEditorStore();
 
     // Setup keyboard shortcuts
     useKeyboardShortcuts({

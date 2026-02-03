@@ -1,11 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { useEditorStore } from '@/store/useEditorStore';
 import type { Clip } from '@/types';
 
 export function Timeline() {
     const timelineRef = useRef<HTMLDivElement>(null);
     const { clips, currentTime, setCurrentTime, zoomLevel, setZoomLevel, duration } = useEditorStore();
-    const [isDragging, setIsDragging] = useState(false);
+    // const [isDragging, setIsDragging] = useState(false);
 
     // Constants
     const PIXELS_PER_SECOND = 100 * zoomLevel;
