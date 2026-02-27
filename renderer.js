@@ -25,6 +25,8 @@ class RevoBrowser {
     this.renderBookmarksBar();
     this.createTab();
     this.updateStatus('Ready');
+    this.updateStats();
+    this.initTipsRotation();
   }
 
   // Storage Helpers
@@ -75,12 +77,15 @@ class RevoBrowser {
 
     this.tabs.push(tab);
     this.renderTabs();
-    this.createWebView(tab);
-    this.switchToTab(tabId);
-
+    
+    // Only create webview if a URL is provided
     if (url) {
+      this.createWebView(tab);
       this.navigate(tabId, url);
     }
+    
+    this.switchToTab(tabId);
+    this.updateStats();
 
     return tab;
   }
@@ -106,13 +111,17 @@ class RevoBrowser {
     }
 
     this.renderTabs();
+    this.updateStats();
   }
 
   switchToTab(tabId) {
     // Hide all webviews and new tab pages
-    document.querySelectorAll('.webview-container, .new-tab-page').forEach(el => {
+    document.querySelectorAll('.webview-container').forEach(el => {
       el.classList.remove('active');
     });
+    
+    const newTabPage = document.getElementById('newTabPage');
+    newTabPage.classList.remove('active');
 
     // Show selected tab's content
     const tab = this.tabs.find(t => t.id === tabId);
@@ -121,7 +130,7 @@ class RevoBrowser {
     this.activeTabId = tabId;
 
     if (tab.url === 'about:newtab') {
-      document.getElementById('newTabPage').classList.add('active');
+      newTabPage.classList.add('active');
     } else {
       const webView = document.getElementById(`webview-${tabId}`);
       if (webView) webView.classList.add('active');
@@ -178,35 +187,51 @@ class RevoBrowser {
     const webView = document.createElement('div');
     webView.className = 'webview-container';
     webView.id = `webview-${tab.id}`;
-    webView.innerHTML = `<webview src="about:blank" allowpopups="${!this.settings.blockPopups}"></webview>`;
+    webView.innerHTML = `<webview allowpopups="${!this.settings.blockPopups}" webpreferences="javascript=yes,webSecurity=yes"></webview>`;
     container.appendChild(webView);
 
     const webview = webView.querySelector('webview');
-    
+    let isDomReady = false;
+
+    // Wait for DOM ready before any operations
+    webview.addEventListener('dom-ready', () => {
+      isDomReady = true;
+    });
+
     webview.addEventListener('did-start-loading', () => {
       tab.isLoading = true;
       this.updateStatus('Loading...');
       this.renderTabs();
+      this.updateNavigationButtons();
     });
 
     webview.addEventListener('did-stop-loading', () => {
       tab.isLoading = false;
-      tab.title = webview.getTitle() || 'New Tab';
+      const title = isDomReady ? webview.getTitle() : tab.title;
+      if (title && title !== 'about:blank') {
+        tab.title = title;
+      }
       this.updateStatus('Ready');
       this.renderTabs();
+      this.updateNavigationButtons();
     });
 
     webview.addEventListener('did-navigate', (e) => {
       tab.url = e.url;
-      tab.title = webview.getTitle() || e.url;
+      const title = isDomReady ? webview.getTitle() : e.url;
+      if (title !== 'about:blank' && title !== e.url) {
+        tab.title = title;
+      }
       this.addToHistory(tab.title, e.url);
       this.updateUrlBar(e.url);
       this.updateBookmarkButton(e.url);
+      this.updateNavigationButtons();
     });
 
     webview.addEventListener('did-navigate-in-page', (e) => {
       tab.url = e.url;
       this.updateUrlBar(e.url);
+      this.updateNavigationButtons();
     });
 
     webview.addEventListener('page-favicon-updated', (e) => {
@@ -217,6 +242,18 @@ class RevoBrowser {
       e.preventDefault();
       this.createTab(e.url);
     });
+
+    // Update URL bar on navigation entries change
+    webview.addEventListener('load-commit', (e) => {
+      if (e.isMainFrame) {
+        tab.url = e.url;
+        this.updateUrlBar(e.url);
+        this.updateNavigationButtons();
+      }
+    });
+
+    // Store webview reference on tab
+    tab.webview = webview;
   }
 
   // Navigation
@@ -243,10 +280,17 @@ class RevoBrowser {
 
     tab.url = url;
 
-    const webView = document.getElementById(`webview-${tabId}`);
+    // Create webview if it doesn't exist
+    let webView = document.getElementById(`webview-${tabId}`);
+    if (!webView) {
+      this.createWebView(tab);
+      webView = document.getElementById(`webview-${tabId}`);
+    }
+
     if (webView) {
       const webview = webView.querySelector('webview');
-      webview.src = url;
+      // Use loadURL instead of setting src to avoid about:blank issues
+      webview.loadURL(url);
       webView.classList.add('active');
       document.getElementById('newTabPage').classList.remove('active');
     }
@@ -258,69 +302,55 @@ class RevoBrowser {
 
   goBack() {
     const tab = this.getActiveTab();
-    if (!tab || tab.historyIndex <= 0 || tab.url === 'about:newtab') {
-      console.log('Cannot go back:', { hasTab: !!tab, historyIndex: tab?.historyIndex, url: tab?.url });
+    if (!tab || tab.url === 'about:newtab') {
       return;
     }
 
-    tab.historyIndex--;
-    const url = tab.history[tab.historyIndex];
-    tab.url = url;
-
     const webView = document.getElementById(`webview-${tab.id}`);
-    if (webView) {
-      const webview = webView.querySelector('webview');
-      webview.src = url;
-      webview.addEventListener('did-stop-loading', () => {
-        this.updateNavigationButtons();
-      }, { once: true });
-    }
+    if (!webView) return;
 
-    this.updateUrlBar(url);
-    this.updateNavigationButtons();
-    console.log('Navigating back to:', url);
+    const webview = webView.querySelector('webview');
+    if (webview && webview.canGoBack()) {
+      webview.goBack();
+    }
   }
 
   goForward() {
     const tab = this.getActiveTab();
-    if (!tab || tab.historyIndex >= tab.history.length - 1 || tab.url === 'about:newtab') {
-      console.log('Cannot go forward:', { hasTab: !!tab, historyIndex: tab?.historyIndex, historyLength: tab?.history.length });
+    if (!tab || tab.url === 'about:newtab') {
       return;
     }
 
-    tab.historyIndex++;
-    const url = tab.history[tab.historyIndex];
-    tab.url = url;
-
     const webView = document.getElementById(`webview-${tab.id}`);
-    if (webView) {
-      const webview = webView.querySelector('webview');
-      webview.src = url;
-      webview.addEventListener('did-stop-loading', () => {
-        this.updateNavigationButtons();
-      }, { once: true });
-    }
+    if (!webView) return;
 
-    this.updateUrlBar(url);
-    this.updateNavigationButtons();
-    console.log('Navigating forward to:', url);
+    const webview = webView.querySelector('webview');
+    if (webview && webview.canGoForward()) {
+      webview.goForward();
+    }
   }
 
   refresh() {
     const tab = this.getActiveTab();
-    if (!tab || tab.url === 'about:newtab') return;
+    if (!tab || tab.url === 'about:newtab') {
+      return;
+    }
 
     const webView = document.getElementById(`webview-${tab.id}`);
     if (webView) {
       const webview = webView.querySelector('webview');
-      webview.reload();
+      if (webview) {
+        webview.reload();
+      }
     }
   }
 
   goHome() {
     const tab = this.getActiveTab();
     if (tab) {
-      this.navigate(tab.id, 'about:newtab');
+      tab.url = 'about:newtab';
+      tab.title = 'New Tab';
+      this.switchToTab(tab.id);
     }
   }
 
@@ -343,26 +373,26 @@ class RevoBrowser {
 
   normalizeUrl(input) {
     let url = input.trim();
-    
+
     if (!url) return 'about:newtab';
-    
-    // Check if it's a URL
+
+    // Check if it's already a full URL
     if (/^https?:\/\//i.test(url)) {
       return url;
     }
-    
-    // Check if it looks like a domain
-    if (/^[a-z0-9-]+\.[a-z]{2,}/i.test(url) && !/\s/.test(url)) {
+
+    // Check if it looks like a domain (has TLD and no spaces)
+    if (/^[a-z0-9-]+\.[a-z]{2,}/i.test(url) && !/\s/.test(url) && !/ /.test(url)) {
       return 'https://' + url;
     }
-    
+
     // Otherwise, treat as search query
     const engines = {
       google: 'https://www.google.com/search?q=',
       duckduckgo: 'https://duckduckgo.com/?q=',
       bing: 'https://www.bing.com/search?q=',
     };
-    
+
     return engines[this.settings.searchEngine] + encodeURIComponent(url);
   }
 
@@ -426,7 +456,8 @@ class RevoBrowser {
         }
         const tab = this.getActiveTab();
         if (tab) {
-          this.navigate(tab.id, value);
+          const normalizedUrl = this.normalizeUrl(value);
+          this.navigate(tab.id, normalizedUrl);
           suggestions.classList.remove('active');
           document.getElementById('urlInput').blur();
         }
@@ -441,6 +472,7 @@ class RevoBrowser {
     this.saveToStorage('revo_bookmarks', this.bookmarks);
     this.renderBookmarksBar();
     this.updateBookmarkButton(url);
+    this.updateStats();
   }
 
   removeBookmark(url) {
@@ -448,6 +480,7 @@ class RevoBrowser {
     this.saveToStorage('revo_bookmarks', this.bookmarks);
     this.renderBookmarksBar();
     this.updateBookmarkButton(url);
+    this.updateStats();
   }
 
   isBookmarked(url) {
@@ -553,7 +586,8 @@ class RevoBrowser {
       if (e.key === 'Enter') {
         const tab = this.getActiveTab();
         if (tab) {
-          this.navigate(tab.id, urlInput.value);
+          const normalizedUrl = this.normalizeUrl(urlInput.value);
+          this.navigate(tab.id, normalizedUrl);
           urlInput.blur();
         }
       }
@@ -589,7 +623,8 @@ class RevoBrowser {
       if (e.key === 'Enter') {
         const tab = this.getActiveTab();
         if (tab) {
-          this.navigate(tab.id, e.target.value);
+          const normalizedUrl = this.normalizeUrl(e.target.value);
+          this.navigate(tab.id, normalizedUrl);
         }
       }
     });
@@ -878,9 +913,10 @@ class RevoBrowser {
     const backBtn = document.getElementById('backBtn');
     const forwardBtn = document.getElementById('forwardBtn');
 
-    if (tab) {
-      backBtn.disabled = tab.historyIndex <= 0;
-      forwardBtn.disabled = tab.historyIndex >= tab.history.length - 1;
+    if (tab && tab.webview) {
+      // Use webview's built-in navigation state
+      backBtn.disabled = !tab.webview.canGoBack();
+      forwardBtn.disabled = !tab.webview.canGoForward();
     } else {
       backBtn.disabled = true;
       forwardBtn.disabled = true;
@@ -899,6 +935,39 @@ class RevoBrowser {
 
   toggleMenu() {
     this.openSettings();
+  }
+
+  // Update Stats on New Tab Page
+  updateStats() {
+    const bookmarkCountEl = document.getElementById('bookmarkCount');
+    const historyCountEl = document.getElementById('historyCount');
+    const tabsCountEl = document.getElementById('tabsCount');
+
+    if (bookmarkCountEl) {
+      bookmarkCountEl.textContent = this.bookmarks.length;
+    }
+
+    if (historyCountEl) {
+      historyCountEl.textContent = this.history.length;
+    }
+
+    if (tabsCountEl) {
+      tabsCountEl.textContent = this.tabs.length;
+    }
+  }
+
+  // Tips Rotation
+  initTipsRotation() {
+    const tipCards = document.querySelectorAll('.tip-card');
+    if (tipCards.length === 0) return;
+
+    let currentTip = 0;
+
+    setInterval(() => {
+      tipCards[currentTip].classList.remove('active');
+      currentTip = (currentTip + 1) % tipCards.length;
+      tipCards[currentTip].classList.add('active');
+    }, 4000); // Change tip every 4 seconds
   }
 }
 

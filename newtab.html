@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab - Revo Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #2b2a33;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 680px;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 8px rgba(128, 90, 213, 0.6));
+        }
+
+        .logo-text {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .search-form {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .google-logo {
+            position: absolute;
+            left: 18px;
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 52px 14px 56px;
+            font-size: 16px;
+            border: 1px solid #5b5b66;
+            border-radius: 40px;
+            background: #42414d;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: #9d9da6;
+        }
+
+        .search-input:focus {
+            background: #4f4e59;
+            border-color: #805ad5;
+            box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.25);
+        }
+
+        /* Shortcuts Section */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            justify-items: center;
+        }
+
+        .shortcut-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #ffffff;
+            padding: 16px 12px;
+            border-radius: 12px;
+            background: #42414d;
+            transition: all 0.15s ease;
+            width: 100%;
+            max-width: 110px;
+        }
+
+        .shortcut-item:hover {
+            background: #52525e;
+        }
+
+        .shortcut-item:active {
+            background: #3d3c47;
+        }
+
+        .shortcut-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2b2a33;
+            overflow: hidden;
+        }
+
+        .shortcut-icon img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .shortcut-label {
+            font-size: 12px;
+            color: #e0e0e0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* Add Shortcut Button */
+        .add-shortcut {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 12px;
+            border-radius: 12px;
+            background: #42414d;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            max-width: 110px;
+            transition: all 0.15s ease;
+        }
+
+        .add-shortcut:hover {
+            background: #52525e;
+        }
+
+        .add-shortcut:active {
+            background: #3d3c47;
+        }
+
+        .add-shortcut-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2b2a33;
+            color: #9d9da6;
+            font-size: 24px;
+        }
+
+        .add-shortcut-label {
+            font-size: 12px;
+            color: #e0e0e0;
+        }
+
+        /* Responsive */
+        @media (max-width: 520px) {
+            .shortcuts-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .shortcut-item,
+            .add-shortcut {
+                max-width: 80px;
+                padding: 12px 8px;
+            }
+
+            .shortcut-icon,
+            .add-shortcut-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .shortcut-icon img {
+                width: 24px;
+                height: 24px;
+            }
+
+            .shortcut-label,
+            .add-shortcut-label {
+                font-size: 11px;
+            }
+
+            .logo-text {
+                font-size: 28px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="boltGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#805ad5"/>
+                            <stop offset="100%" style="stop-color:#4299e1"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M34 4L12 36h14v24l22-32H34V4z" fill="url(#boltGradient)"/>
+                </svg>
+            </div>
+            <span class="logo-text">Revo</span>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <form class="search-form" action="https://www.google.com/search" method="GET" target="_blank">
+                <!-- Google G Logo -->
+                <svg class="google-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <input
+                    type="text"
+                    name="q"
+                    class="search-input"
+                    placeholder="Search with Google or enter address"
+                    autocomplete="off"
+                    autofocus
+                >
+            </form>
+        </div>
+
+        <!-- Shortcuts Grid -->
+        <div class="shortcuts-grid">
+            <a href="https://www.youtube.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" alt="YouTube">
+                </div>
+                <span class="shortcut-label">YouTube</span>
+            </a>
+
+            <a href="https://github.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=github.com&sz=64" alt="GitHub">
+                </div>
+                <span class="shortcut-label">GitHub</span>
+            </a>
+
+            <a href="https://claude.ai" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="Claude">
+                </div>
+                <span class="shortcut-label">Claude</span>
+            </a>
+
+            <a href="https://mail.google.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" alt="Gmail">
+                </div>
+                <span class="shortcut-label">Gmail</span>
+            </a>
+
+            <a href="https://www.tiktok.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=tiktok.com&sz=64" alt="TikTok">
+                </div>
+                <span class="shortcut-label">TikTok</span>
+            </a>
+
+            <a href="https://www.facebook.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=facebook.com&sz=64" alt="Facebook">
+                </div>
+                <span class="shortcut-label">Facebook</span>
+            </a>
+
+            <a href="https://twitter.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=twitter.com&sz=64" alt="Twitter/X">
+                </div>
+                <span class="shortcut-label">Twitter/X</span>
+            </a>
+
+            <a href="https://www.reddit.com" class="shortcut-item" target="_blank">
+                <div class="shortcut-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=reddit.com&sz=64" alt="Reddit">
+                </div>
+                <span class="shortcut-label">Reddit</span>
+            </a>
+
+            <!-- Add Shortcut Button -->
+            <button class="add-shortcut" onclick="alert('Add shortcut feature coming soon!')">
+                <div class="add-shortcut-icon">+</div>
+                <span class="add-shortcut-label">Add shortcut</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Allow Enter key to submit search
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    // Check if it's a URL
+                    if (query.includes('.') && !query.includes(' ')) {
+                        const url = query.startsWith('http') ? query : 'https://' + query;
+                        window.open(url, '_blank');
+                    } else {
+                        this.closest('form').submit();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

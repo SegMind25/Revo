@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https:;">
   <title>Revo Browser</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -115,12 +116,129 @@
             <div class="search-container">
               <div class="ntp-search-bar">
                 <i class="fas fa-search search-icon"></i>
-                <input 
-                  type="text" 
-                  class="ntp-search-input" 
+                <input
+                  type="text"
+                  class="ntp-search-input"
                   id="ntpSearchInput"
                   placeholder="Search the web..."
                 >
+              </div>
+            </div>
+          </div>
+
+          <!-- Browser Info & Stats Section -->
+          <div class="browser-info-section">
+            <div class="info-cards-grid">
+              <div class="info-card">
+                <div class="info-card-icon bookmarks">
+                  <i class="fas fa-bookmark"></i>
+                </div>
+                <div class="info-card-content">
+                  <h4 class="info-card-title">Bookmarks</h4>
+                  <p class="info-card-value" id="bookmarkCount">0</p>
+                  <p class="info-card-label">Saved Pages</p>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="info-card-icon history">
+                  <i class="fas fa-history"></i>
+                </div>
+                <div class="info-card-content">
+                  <h4 class="info-card-title">History</h4>
+                  <p class="info-card-value" id="historyCount">0</p>
+                  <p class="info-card-label">Pages Visited</p>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="info-card-icon tabs">
+                  <i class="fas fa-copy"></i>
+                </div>
+                <div class="info-card-content">
+                  <h4 class="info-card-title">Tabs</h4>
+                  <p class="info-card-value" id="tabsCount">1</p>
+                  <p class="info-card-label">Open Tabs</p>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="info-card-icon version">
+                  <i class="fas fa-tag"></i>
+                </div>
+                <div class="info-card-content">
+                  <h4 class="info-card-title">Version</h4>
+                  <p class="info-card-value">1.0.0</p>
+                  <p class="info-card-label">Latest Release</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Features Section -->
+          <div class="features-section">
+            <h3 class="section-title">Features</h3>
+            <div class="features-grid">
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-bolt"></i>
+                </div>
+                <div class="feature-content">
+                  <h4>Lightning Fast</h4>
+                  <p>Built on Electron for optimal performance and speed</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-content">
+                  <h4>Secure Browsing</h4>
+                  <p>Enhanced privacy with popup blocking and Do Not Track</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-palette"></i>
+                </div>
+                <div class="feature-content">
+                  <h4>Customizable Theme</h4>
+                  <p>Switch between dark and light modes effortlessly</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-copy"></i>
+                </div>
+                <div class="feature-content">
+                  <h4>Tab Management</h4>
+                  <p>Effortlessly manage multiple browsing sessions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Tips Section -->
+          <div class="tips-section">
+            <h3 class="section-title">
+              <i class="fas fa-lightbulb"></i>
+              Quick Tips
+            </h3>
+            <div class="tips-container" id="tipsContainer">
+              <div class="tip-card active">
+                <p>Use <kbd>Ctrl+T</kbd> to open a new tab quickly</p>
+              </div>
+              <div class="tip-card">
+                <p>Press <kbd>Ctrl+L</kbd> to focus the URL bar</p>
+              </div>
+              <div class="tip-card">
+                <p>Use <kbd>Alt+Left</kbd> and <kbd>Alt+Right</kbd> to navigate history</p>
+              </div>
+              <div class="tip-card">
+                <p>Press <kbd>F5</kbd> or <kbd>Ctrl+R</kbd> to refresh the page</p>
+              </div>
+              <div class="tip-card">
+                <p>Use <kbd>Ctrl+W</kbd> to close the current tab</p>
+              </div>
+              <div class="tip-card">
+                <p>Use <kbd>Ctrl+Tab</kbd> to switch between tabs</p>
               </div>
             </div>
           </div>
