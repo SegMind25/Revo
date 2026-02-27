@@ -20,13 +20,14 @@
             align-items: center;
             justify-content: center;
             color: #ffffff;
+            font-size: 12px;
         }
 
         .container {
             text-align: center;
-            padding: 20px;
+            padding: 16px;
             width: 100%;
-            max-width: 680px;
+            max-width: 600px;
         }
 
         /* Logo Section */
@@ -34,13 +35,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 32px;
+            gap: 10px;
+            margin-bottom: 24px;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
         }
 
         .logo-icon svg {
@@ -50,7 +51,7 @@
         }
 
         .logo-text {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: -0.5px;
@@ -59,7 +60,7 @@
         /* Search Bar */
         .search-container {
             width: 100%;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
 
         .search-form {
@@ -70,16 +71,16 @@
 
         .google-logo {
             position: absolute;
-            left: 18px;
-            width: 24px;
-            height: 24px;
+            left: 14px;
+            width: 20px;
+            height: 20px;
             pointer-events: none;
         }
 
         .search-input {
             width: 100%;
-            padding: 14px 52px 14px 56px;
-            font-size: 16px;
+            padding: 11px 42px 11px 44px;
+            font-size: 14px;
             border: 1px solid #5b5b66;
             border-radius: 40px;
             background: #42414d;
@@ -102,7 +103,7 @@
         .shortcuts-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
             justify-items: center;
         }
 
@@ -110,15 +111,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
             color: #ffffff;
-            padding: 16px 12px;
-            border-radius: 12px;
+            padding: 12px 10px;
+            border-radius: 10px;
             background: #42414d;
             transition: all 0.15s ease;
             width: 100%;
-            max-width: 110px;
+            max-width: 90px;
         }
 
         .shortcut-item:hover {
@@ -130,8 +131,8 @@
         }
 
         .shortcut-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -141,13 +142,13 @@
         }
 
         .shortcut-icon img {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             object-fit: contain;
         }
 
         .shortcut-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #e0e0e0;
             white-space: nowrap;
             overflow: hidden;
@@ -160,14 +161,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            padding: 16px 12px;
-            border-radius: 12px;
+            gap: 6px;
+            padding: 12px 10px;
+            border-radius: 10px;
             background: #42414d;
             border: none;
             cursor: pointer;
             width: 100%;
-            max-width: 110px;
+            max-width: 90px;
             transition: all 0.15s ease;
         }
 
@@ -180,19 +181,19 @@
         }
 
         .add-shortcut-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #2b2a33;
             color: #9d9da6;
-            font-size: 24px;
+            font-size: 20px;
         }
 
         .add-shortcut-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #e0e0e0;
         }
 
@@ -200,38 +201,38 @@
         @media (max-width: 520px) {
             .shortcuts-grid {
                 grid-template-columns: repeat(4, 1fr);
-                gap: 8px;
+                gap: 6px;
             }
 
             .shortcut-item,
             .add-shortcut {
-                max-width: 80px;
-                padding: 12px 8px;
+                max-width: 70px;
+                padding: 10px 6px;
             }
 
             .shortcut-icon,
             .add-shortcut-icon {
-                width: 40px;
-                height: 40px;
+                width: 32px;
+                height: 32px;
             }
 
             .shortcut-icon img {
-                width: 24px;
-                height: 24px;
+                width: 20px;
+                height: 20px;
             }
 
             .shortcut-label,
             .add-shortcut-label {
-                font-size: 11px;
+                font-size: 10px;
             }
 
             .logo-text {
-                font-size: 28px;
+                font-size: 24px;
             }
 
             .logo-icon {
-                width: 40px;
-                height: 40px;
+                width: 32px;
+                height: 32px;
             }
         }
     </style>

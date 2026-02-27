@@ -8,6 +8,9 @@ class RevoBrowser {
     this.tabCounter = 0;
     this.bookmarks = this.loadFromStorage('revo_bookmarks') || [];
     this.history = this.loadFromStorage('revo_history') || [];
+    this.shortcuts = [];
+    this.downloads = [];
+    this.extensions = [];
     this.settings = this.loadFromStorage('revo_settings') || {
       theme: 'dark',
       showBookmarksBar: true,
@@ -19,14 +22,18 @@ class RevoBrowser {
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.loadShortcuts();
+    await this.loadExtensions();
     this.applySettings();
     this.bindEvents();
     this.renderBookmarksBar();
+    this.renderShortcuts();
     this.createTab();
     this.updateStatus('Ready');
     this.updateStats();
     this.initTipsRotation();
+    this.setupDownloadListeners();
   }
 
   // Storage Helpers
@@ -40,6 +47,234 @@ class RevoBrowser {
 
   saveToStorage(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  // Shortcuts Management
+  async loadShortcuts() {
+    try {
+      this.shortcuts = await window.electronAPI.getShortcuts();
+    } catch (error) {
+      this.shortcuts = [];
+    }
+  }
+
+  renderShortcuts() {
+    const grid = document.getElementById('quickLinksGrid');
+    if (!grid) return;
+
+    // Keep the "Add" button, remove old shortcuts
+    const addButton = grid.querySelector('.add-new');
+    grid.innerHTML = '';
+
+    this.shortcuts.forEach(shortcut => {
+      const shortcutEl = document.createElement('div');
+      shortcutEl.className = 'quick-link';
+      shortcutEl.dataset.url = shortcut.url;
+      shortcutEl.innerHTML = `
+        <div class="quick-link-icon custom">
+          <i class="fas fa-link"></i>
+        </div>
+        <span class="quick-link-label">${this.escapeHtml(shortcut.name)}</span>
+        <button class="shortcut-remove" data-id="${shortcut.id}">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+
+      shortcutEl.addEventListener('click', (e) => {
+        if (!e.target.closest('.shortcut-remove')) {
+          const tab = this.getActiveTab();
+          if (tab) {
+            this.navigate(tab.id, shortcut.url);
+          }
+        }
+      });
+
+      const removeBtn = shortcutEl.querySelector('.shortcut-remove');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const result = await window.electronAPI.removeShortcut(shortcut.id);
+          if (result.success) {
+            this.shortcuts = result.shortcuts;
+            this.renderShortcuts();
+          }
+        });
+      }
+
+      grid.appendChild(shortcutEl);
+    });
+
+    // Add the "Add" button back
+    if (addButton) {
+      grid.appendChild(addButton);
+    }
+  }
+
+  async addShortcut(name, url) {
+    const result = await window.electronAPI.addShortcut({ name, url });
+    if (result.success) {
+      this.shortcuts = result.shortcuts;
+      this.renderShortcuts();
+    }
+  }
+
+  // Extensions Management
+  async loadExtensions() {
+    try {
+      // Use the non-deprecated API
+      const { ipcRenderer } = require('electron');
+      this.extensions = await ipcRenderer.invoke('get-extensions');
+    } catch (error) {
+      this.extensions = [];
+    }
+  }
+
+  async loadExtension(extensionPath) {
+    const result = await window.electronAPI.loadExtension(extensionPath);
+    if (result.success) {
+      await this.loadExtensions();
+      this.renderExtensionsPanel();
+    }
+    return result;
+  }
+
+  async removeExtension(extensionId) {
+    const result = await window.electronAPI.removeExtension(extensionId);
+    if (result.success) {
+      await this.loadExtensions();
+      this.renderExtensionsPanel();
+    }
+    return result;
+  }
+
+  renderExtensionsPanel() {
+    const content = document.getElementById('extensionsContent');
+    if (!content) return;
+
+    if (this.extensions.length === 0) {
+      content.innerHTML = `
+        <div class="extensions-empty">
+          <i class="fas fa-puzzle-piece"></i>
+          <p>No extensions installed</p>
+          <p class="extensions-hint">Drag and drop extension folders to install</p>
+        </div>
+      `;
+    } else {
+      content.innerHTML = this.extensions.map(ext => `
+        <div class="extension-item">
+          <div class="extension-info">
+            <h4>${this.escapeHtml(ext.name)}</h4>
+            <p>Version: ${this.escapeHtml(ext.version)}</p>
+          </div>
+          <button class="extension-remove" data-id="${ext.id}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `).join('');
+
+      content.querySelectorAll('.extension-remove').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          await this.removeExtension(btn.dataset.id);
+        });
+      });
+    }
+  }
+
+  // Download Management
+  setupDownloadListeners() {
+    const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('download-started', (event, info) => {
+      this.downloads.push({
+        fileName: info.fileName,
+        progress: 0,
+        status: 'downloading'
+      });
+      this.updateDownloadsPanel();
+    });
+
+    ipcRenderer.on('download-progress', (event, info) => {
+      const download = this.downloads.find(d => d.fileName === info.fileName);
+      if (download) {
+        download.progress = info.progress;
+        download.receivedBytes = info.receivedBytes;
+        download.totalBytes = info.totalBytes;
+        this.updateDownloadsPanel();
+      }
+    });
+
+    ipcRenderer.on('download-completed', (event, info) => {
+      const download = this.downloads.find(d => d.fileName === info.fileName);
+      if (download) {
+        download.status = 'completed';
+        download.filePath = info.filePath;
+        download.progress = 100;
+        this.updateDownloadsPanel();
+        this.showNotification('Download Complete', `${info.fileName} has been downloaded.`);
+      }
+    });
+
+    ipcRenderer.on('download-failed', (event, info) => {
+      const download = this.downloads.find(d => d.fileName === info.fileName);
+      if (download) {
+        download.status = 'failed';
+        this.updateDownloadsPanel();
+        this.showNotification('Download Failed', `${info.fileName} failed to download.`);
+      }
+    });
+  }
+
+  updateDownloadsPanel() {
+    const content = document.getElementById('downloadsContent');
+    if (!content) return;
+
+    if (this.downloads.length === 0) {
+      content.innerHTML = `
+        <div class="downloads-empty">
+          <i class="fas fa-download"></i>
+          <p>No downloads yet</p>
+        </div>
+      `;
+    } else {
+      content.innerHTML = this.downloads.slice().reverse().map(d => `
+        <div class="download-item ${d.status}">
+          <div class="download-info">
+            <h4>${this.escapeHtml(d.fileName)}</h4>
+            <p class="download-status">${d.status === 'completed' ? 'Completed' : d.status === 'failed' ? 'Failed' : d.progress + '%'}</p>
+            ${d.status === 'downloading' ? `
+              <div class="download-progress-bar">
+                <div class="download-progress-fill" style="width: ${d.progress}%"></div>
+              </div>
+            ` : ''}
+            ${d.status === 'completed' && d.filePath ? `
+              <button class="download-open" data-path="${d.filePath}">
+                <i class="fas fa-folder"></i> Show in Folder
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      content.querySelectorAll('.download-open').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const { ipcRenderer } = require('electron');
+          ipcRenderer.invoke('shell.showItemInFolder', btn.dataset.path);
+        });
+      });
+    }
+  }
+
+  showNotification(title, message) {
+    // Simple notification using browser notification API
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body: message });
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification(title, { body: message });
+        }
+      });
+    }
   }
 
   // Settings
@@ -187,15 +422,26 @@ class RevoBrowser {
     const webView = document.createElement('div');
     webView.className = 'webview-container';
     webView.id = `webview-${tab.id}`;
-    webView.innerHTML = `<webview allowpopups="${!this.settings.blockPopups}" webpreferences="javascript=yes,webSecurity=yes"></webview>`;
+    
+    const webview = document.createElement('webview');
+    webview.setAttribute('src', 'about:blank');
+    webview.setAttribute('allowpopups', !this.settings.blockPopups);
+    webview.setAttribute('webpreferences', 'javascript=yes,webSecurity=yes,allowRunningInsecureContent=no');
+    webview.setAttribute('partition', 'persist:revo');
+    
+    webView.appendChild(webview);
     container.appendChild(webView);
-
-    const webview = webView.querySelector('webview');
     let isDomReady = false;
 
     // Wait for DOM ready before any operations
     webview.addEventListener('dom-ready', () => {
       isDomReady = true;
+      tab.isDomReady = true;
+      // Execute any pending navigation if needed
+      if (tab.pendingUrl) {
+        webview.loadURL(tab.pendingUrl);
+        tab.pendingUrl = null;
+      }
     });
 
     webview.addEventListener('did-start-loading', () => {
@@ -252,8 +498,9 @@ class RevoBrowser {
       }
     });
 
-    // Store webview reference on tab
+    // Store webview reference and dom-ready state on tab
     tab.webview = webview;
+    tab.isDomReady = false;
   }
 
   // Navigation
@@ -289,10 +536,17 @@ class RevoBrowser {
 
     if (webView) {
       const webview = webView.querySelector('webview');
-      // Use loadURL instead of setting src to avoid about:blank issues
-      webview.loadURL(url);
-      webView.classList.add('active');
-      document.getElementById('newTabPage').classList.remove('active');
+      // Check if DOM is ready before calling loadURL
+      if (tab.isDomReady) {
+        webview.loadURL(url);
+        webView.classList.add('active');
+        document.getElementById('newTabPage').classList.remove('active');
+      } else {
+        // Store the URL to load once DOM is ready
+        tab.pendingUrl = url;
+        webView.classList.add('active');
+        document.getElementById('newTabPage').classList.remove('active');
+      }
     }
 
     this.updateUrlBar(url);
@@ -310,7 +564,7 @@ class RevoBrowser {
     if (!webView) return;
 
     const webview = webView.querySelector('webview');
-    if (webview && webview.canGoBack()) {
+    if (webview && tab.isDomReady && webview.canGoBack()) {
       webview.goBack();
     }
   }
@@ -325,7 +579,7 @@ class RevoBrowser {
     if (!webView) return;
 
     const webview = webView.querySelector('webview');
-    if (webview && webview.canGoForward()) {
+    if (webview && tab.isDomReady && webview.canGoForward()) {
       webview.goForward();
     }
   }
@@ -339,7 +593,7 @@ class RevoBrowser {
     const webView = document.getElementById(`webview-${tab.id}`);
     if (webView) {
       const webview = webView.querySelector('webview');
-      if (webview) {
+      if (webview && tab.isDomReady) {
         webview.reload();
       }
     }
@@ -640,6 +894,20 @@ class RevoBrowser {
       });
     });
 
+    // Add new shortcut button
+    const addShortcutBtn = document.querySelector('.quick-link.add-new');
+    if (addShortcutBtn) {
+      addShortcutBtn.addEventListener('click', async () => {
+        const name = prompt('Enter shortcut name:');
+        if (!name) return;
+
+        const url = prompt('Enter URL (e.g., https://example.com):');
+        if (!url) return;
+
+        await this.addShortcut(name, url);
+      });
+    }
+
     // NTP shortcuts
     document.getElementById('showBookmarksBtn').addEventListener('click', () => {
       this.openSidebar('bookmarks');
@@ -649,8 +917,17 @@ class RevoBrowser {
       this.openSidebar('history');
     });
 
+    document.getElementById('showDownloadsBtn').addEventListener('click', () => {
+      this.openSidebar('downloads');
+    });
+
     document.getElementById('showSettingsBtn').addEventListener('click', () => {
       this.openSettings();
+    });
+
+    // Extensions button
+    document.getElementById('extensionsBtn').addEventListener('click', () => {
+      this.openSidebar('extensions');
     });
 
     // Sidebar
@@ -821,6 +1098,14 @@ class RevoBrowser {
             </div>
           `).join('')
         : '<p style="color: var(--text-muted); text-align: center; padding: 40px 20px;">No history yet<br><br>Start browsing to see your history!</p>';
+    } else if (type === 'downloads') {
+      title.textContent = 'Downloads';
+      this.updateDownloadsPanel();
+      return;
+    } else if (type === 'extensions') {
+      title.textContent = 'Extensions';
+      this.renderExtensionsPanel();
+      return;
     }
 
     // Add click handlers
@@ -892,7 +1177,7 @@ class RevoBrowser {
         break;
       case 'inspect':
         const tab = this.getActiveTab();
-        if (tab) {
+        if (tab && tab.isDomReady) {
           const webView = document.getElementById(`webview-${tab.id}`);
           if (webView) {
             const webview = webView.querySelector('webview');
@@ -913,7 +1198,7 @@ class RevoBrowser {
     const backBtn = document.getElementById('backBtn');
     const forwardBtn = document.getElementById('forwardBtn');
 
-    if (tab && tab.webview) {
+    if (tab && tab.webview && tab.isDomReady) {
       // Use webview's built-in navigation state
       backBtn.disabled = !tab.webview.canGoBack();
       forwardBtn.disabled = !tab.webview.canGoForward();
@@ -976,8 +1261,27 @@ document.addEventListener('DOMContentLoaded', () => {
   window.revoBrowser = new RevoBrowser();
 });
 
-// Electron IPC handlers
+// Electron API wrapper for cleaner IPC calls
 const { ipcRenderer } = require('electron');
+
+window.electronAPI = {
+  // Shortcuts
+  addShortcut: (shortcut) => ipcRenderer.invoke('add-shortcut', shortcut),
+  getShortcuts: () => ipcRenderer.invoke('get-shortcuts'),
+  removeShortcut: (id) => ipcRenderer.invoke('remove-shortcut', id),
+
+  // Extensions
+  loadExtension: (path) => ipcRenderer.invoke('load-extension', path),
+  getExtensions: () => ipcRenderer.invoke('get-extensions'),
+  removeExtension: (id) => ipcRenderer.invoke('remove-extension', id),
+
+  // Downloads
+  getDownloadsPath: () => ipcRenderer.invoke('get-downloads-path'),
+  showDownloadDialog: (url) => ipcRenderer.invoke('show-download-dialog', url),
+
+  // Shell
+  showItemInFolder: (path) => ipcRenderer.invoke('shell.showItemInFolder', path),
+};
 
 ipcRenderer.on('navigate', (event, url) => {
   if (window.revoBrowser) {
