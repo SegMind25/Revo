@@ -1,31 +1,30 @@
 {
-    "name": "revo-video-editor",
-    "version": "1.0.0",
-    "description": "Professional video editor with modern UI/UX",
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "tsc && vite build",
-        "preview": "vite preview",
-        "tauri": "tauri",
-        "tauri:dev": "tauri dev",
-        "tauri:build": "tauri build"
-    },
-    "dependencies": {
-        "@tauri-apps/api": "^2.0.0",
-        "@tauri-apps/plugin-shell": "^2.0.0",
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1",
-        "zustand": "^4.5.2",
-        "framer-motion": "^11.2.0",
-        "lucide-react": "^0.400.0"
-    },
-    "devDependencies": {
-        "@tauri-apps/cli": "^2.0.0",
-        "@types/react": "^18.3.3",
-        "@types/react-dom": "^18.3.0",
-        "@vitejs/plugin-react": "^4.3.1",
-        "typescript": "^5.5.3",
-        "vite": "^5.3.1"
-    }
+  "name": "revo-browser",
+  "version": "1.0.0",
+  "description": "Revo - Modern Lightweight Firefox-based Browser",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SegMind25/Revo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SegMind25/Revo/issues"
+  },
+  "homepage": "https://github.com/SegMind25/Revo#readme",
+  "dependencies": {
+    "electron": "^40.6.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.2.1"
+  }
 }
