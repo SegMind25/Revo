@@ -86,7 +86,7 @@ export default function Navbar({
         display: "grid",
         gridTemplateColumns: isLargeScreen ? "320px 1fr 320px" : "1fr 1fr 1fr"
       }}
-      className="bg-card pointer-events-none flex h-13 items-center border-b border-border/80 px-2"
+      className="bg-background/70 backdrop-blur-2xl pointer-events-none flex h-16 items-center border-b border-border/50 shadow-sm shadow-black/10 px-4 transition-all duration-300 z-50 sticky top-0"
     >
       <DownloadProgressModal />
 
@@ -189,7 +189,7 @@ const DownloadPopover = ({ stateManager }: { stateManager: StateManager }) => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          className="flex h-8 gap-1 border border-border rounded-full"
+          className="flex h-9 gap-2 border-none bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all rounded-full px-5"
           size={isMediumScreen ? "sm" : "icon"}
         >
           {/* <Download width={18} />{" "} */}

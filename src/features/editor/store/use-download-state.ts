@@ -68,7 +68,18 @@ export const useDownloadState = create<DownloadState>((set, get) => ({
           })
         });
 
-        if (!response.ok) throw new Error("Failed to submit export request.");
+        if (!response.ok) {
+          let errMessage = "Failed to submit export request.";
+          try {
+            const errData = await response.json();
+            if (errData?.message) errMessage = errData.message;
+          } catch(e) {}
+          
+          if (errMessage.includes("<html") || errMessage.includes("Server Error")) {
+            errMessage = "Cloud rendering service is temporarily unavailable due to downtime.";
+          }
+          throw new Error(errMessage);
+        }
 
         const jobInfo = await response.json();
         const jobId = jobInfo.render.id;

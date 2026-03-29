@@ -18,7 +18,13 @@ export async function POST(request: Request) {
     );
 
     if (!projectResponse.ok) {
-      const projectError = await projectResponse.json();
+      const errorText = await projectResponse.text();
+      let projectError;
+      try {
+        projectError = JSON.parse(errorText);
+      } catch (e) {
+        projectError = { message: errorText };
+      }
       return NextResponse.json(
         { message: projectError?.message || "Failed to create project" },
         { status: projectResponse.status }
@@ -42,7 +48,13 @@ export async function POST(request: Request) {
     );
 
     if (!exportResponse.ok) {
-      const exportError = await exportResponse.json();
+      const errorText = await exportResponse.text();
+      let exportError;
+      try {
+        exportError = JSON.parse(errorText);
+      } catch (e) {
+        exportError = { message: errorText };
+      }
       return NextResponse.json(
         { message: exportError?.message || "Failed to initialize export" },
         { status: exportResponse.status }

@@ -1,134 +1,40 @@
-# Revo Browser
+# Revo Video Editor
 
-A modern, lightweight browser built with Electron for fast and secure browsing.
+A powerful, modern Web Video Editor built with Next.js, React, and TailwindCSS. Revo features complex timeline management, video trimming, text overlays, and server-side rendering support.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![License](https://img.shields.io/badge/license-ISC-green)
+## Recent Architecture Updates
 
-## Features
+- **Local Uploads Bypass**: Replaced strict Google Cloud Run external dependencies with a robust local Next.js `/api/uploads/local` filesystem proxy to allow true offline editing without 503 HTTP errors.
+- **Graceful Error Handling**: Implemented safe HTML payload parsing to protect backend renderer API routes from crashing during cloud API outages.
+- **Secure Context Fixes**: Added COOP/COEP Cross-Origin security headers to `next.config.ts` to allow high-performance `SharedArrayBuffer` multithreading and Origin Private File System (OPFS) capabilities.
 
-- ⚡ **Lightning Fast** - Built on Electron for optimal performance
-- 🛡️ **Secure Browsing** - Enhanced privacy with popup blocking and Do Not Track
-- 🎨 **Customizable Theme** - Switch between dark and light modes
-- 📑 **Tab Management** - Multiple tabs with easy management
-- 🔖 **Bookmarks** - Save and organize your favorite pages
-- 📜 **History** - Track your browsing history
-- ⬇️ **Downloads** - Built-in download manager
-- 🧩 **Extensions** - Support for browser extensions
-- 🔗 **Quick Shortcuts** - Add custom website shortcuts to new tab page
+## Premium UI & Dark Mode Overhaul
+We completely redesigned Revo into a Premium Dark Mode video editor:
+- **Obsidian Dark Theme**: Switched from default Tailwind light grays to deep `zinc-950` backgrounds.
+- **Dynamic Glassmorphism**: Integrated `backdrop-blur-2xl` transparent Navbars and semi-transparent panels.
+- **Ambient Glows**: Added soft glowing background elements (`bg-violet-600/10` and `bg-cyan-600/10`) to provide an immersive depth.
+- **Micro-Animations**: Updated core CTA buttons (Export) with animated linear gradients and hover drop shadows.
 
-## Installation
+## Getting Started
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm
-
-### Install Dependencies
+First, install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
-## Usage
-
-### Development Mode
+Start the development server:
 
 ```bash
-npm start
+pnpm dev
+# Note: To utilize OPFS features efficiently, ensure you access via http://localhost:3000 rather than a local network IP.
 ```
 
-or with logging:
-
-```bash
-npm run dev
-```
-
-## Building
-
-### Build for Linux (.deb)
-
-```bash
-npm run build:linux
-```
-
-This creates a `.deb` package in the `export` folder.
-
-### Build for Windows (.exe)
-
-```bash
-npm run build:win
-```
-
-This creates:
-- NSIS installer (`.exe`)
-- Portable executable
-
-### Build for Both Platforms
-
-```bash
-npm run build:all
-```
-
-All builds are output to the `export` folder.
-
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+T` | New tab |
-| `Ctrl+W` | Close current tab |
-| `Ctrl+Tab` | Switch to next tab |
-| `Ctrl+L` | Focus URL bar |
-| `F5` or `Ctrl+R` | Refresh page |
-| `Alt+Left` | Go back |
-| `Alt+Right` | Go forward |
-
-## Adding Extensions
-
-1. Click the puzzle piece icon (Extensions) in the toolbar
-2. Drag and drop extension folders to install
-3. Extensions are loaded from the browser's user data directory
-
-## Adding Website Shortcuts
-
-1. On the new tab page, click the "Add" button in the Quick Links section
-2. Enter a name for the shortcut
-3. Enter the full URL (e.g., `https://example.com`)
-4. The shortcut will appear in the Quick Links grid
-
-## Project Structure
-
-```
-revo-browser/
-├── main.js          # Main Electron process
-├── renderer.js      # Renderer process (browser UI)
-├── index.html       # Main HTML file
-├── styles.css       # Stylesheet
-├── package.json     # Project configuration
-└── README.md        # This file
-```
-
-## Configuration
-
-Edit `package.json` to customize:
-- App name and version
-- Build targets
-- File associations
-
-## License
-
-ISC License
+## Tech Stack
+- **Framework:** Next.js (App Router)
+- **Styling:** Tailwind CSS + UI themes
+- **Video Engine:** DesignCombo Frames & remotion
+- **State:** Zustand
 
 ## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## Support
-
-For issues and feature requests, please visit:
-https://github.com/SegMind25/Revo/issues
+Updates are synced to the `main` branch.

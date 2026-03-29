@@ -25,7 +25,13 @@ export async function GET(
       }
     );
 
-    const statusData = await response.json();
+    const errorText = await response.text();
+    let statusData;
+    try {
+      statusData = JSON.parse(errorText);
+    } catch (e) {
+      statusData = { message: errorText };
+    }
 
     if (!response.ok) {
       const error = new Error(

@@ -157,8 +157,13 @@ class Video extends Trimmable {
     // Dynamically import MP4Clip only on the client side
     if (typeof window !== "undefined") {
       try {
-        const { MP4Clip } = await import("@designcombo/frames");
-        this.clip = new MP4Clip(stream);
+        if (!navigator.storage || !navigator.storage.getDirectory) {
+          console.warn("OPFS is not available. Ensure you are on HTTPS or localhost. Skipping MP4Clip.");
+          this.clip = null;
+        } else {
+          const { MP4Clip } = await import("@designcombo/frames");
+          this.clip = new MP4Clip(stream);
+        }
       } catch (error) {
         console.warn("Failed to load MP4Clip:", error);
         this.clip = null;
