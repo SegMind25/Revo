@@ -1,0 +1,18 @@
+<svg width="200" height="200" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="revoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#8B5CF6"/>
+      <stop offset="50%" stopColor="#7C3AED"/>
+      <stop offset="100%" stopColor="#06B6D4"/>
+    </linearGradient>
+    <filter id="revoGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="100" height="100" rx="20" fill="hsl(240 8% 4%)"/>
+  <path d="M30 25 L55 25 C68 25 75 32 75 42 C75 50 71 55 63 58 L78 75 L68 75 L54 58 L48 58 L48 75 L30 75 Z M48 42 L48 58 L55 58 C62 58 66 55 66 49 C66 44 63 42 56 42 L48 42 Z" fill="url(#revoGradient)" filter="url(#revoGlow)"/>
+</svg>

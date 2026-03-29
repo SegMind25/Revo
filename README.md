@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="public/revo-logo.svg" alt="Revo Logo" width="120" height="120" />
+</div>
+
 # Revo Video Editor
 
 A powerful, modern Web Video Editor built with Next.js, React, and TailwindCSS. Revo features complex timeline management, video trimming, text overlays, and server-side rendering support.
